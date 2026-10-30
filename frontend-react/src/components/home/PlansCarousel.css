@@ -1,0 +1,54 @@
+/* Thẻ gói cước: 1 thẻ / hàng trên điện thoại, 2 trên tablet, 4 trên máy tính. */
+.plan-card {
+  flex-shrink: 0;
+  width: 100%;
+  min-width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+@media (min-width: 640px) {
+  .plan-card {
+    width: calc((100% - 16px) / 2);
+    min-width: calc((100% - 16px) / 2);
+    max-width: calc((100% - 16px) / 2);
+  }
+}
+@media (min-width: 1024px) {
+  .plan-card {
+    width: calc((100% - 48px) / 4);
+    min-width: calc((100% - 48px) / 4);
+    max-width: calc((100% - 48px) / 4);
+  }
+}
+
+.plans-carousel-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: #0284c7 rgba(2, 132, 199, 0.15);
+}
+.dark .plans-carousel-scrollbar {
+  scrollbar-color: #38bdf8 rgba(56, 189, 248, 0.2);
+}
+.plans-carousel-scrollbar::-webkit-scrollbar {
+  height: 8px;
+}
+.plans-carousel-scrollbar::-webkit-scrollbar-track {
+  background: rgba(2, 132, 199, 0.12);
+  border-radius: 9999px;
+}
+.dark .plans-carousel-scrollbar::-webkit-scrollbar-track {
+  background: rgba(21, 36, 52, 0.8);
+}
+.plans-carousel-scrollbar::-webkit-scrollbar-thumb {
+  background: #0284c7;
+  border-radius: 9999px;
+  cursor: pointer;
+}
+.plans-carousel-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #0369a1;
+}
+.dark .plans-carousel-scrollbar::-webkit-scrollbar-thumb {
+  background: #38bdf8;
+}
+.dark .plans-carousel-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #7dd3fc;
+}

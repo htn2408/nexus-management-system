@@ -1,0 +1,123 @@
+# Bản demo chạy độc lập: database mới tinh có sẵn dữ liệu mẫu, không đụng dữ liệu thật.
+#   Chạy:  docker compose -f docker-compose.demo.yml up -d --build     (hoặc npm run demo:up)
+#   Tắt:   docker compose -f docker-compose.demo.yml down -v           (hoặc npm run demo:down, xoá luôn dữ liệu demo)
+#
+#   Giao diện  http://localhost:3100
+#   API        http://localhost:5205   (Swagger: /api-docs)
+#   SQL Server localhost,14330         (user sa, mật khẩu bên dưới)
+#
+# Mọi tài khoản mẫu (nhân viên + khách có email) dùng mật khẩu 1234567890, khớp với các nút
+# đăng nhập nhanh trên trang Login. Mật khẩu và khoá JWT ở đây chỉ dùng cho máy local.
+name: nexus-demo
+
+x-sa-password: &sa-password NexusDemo!2026
+
+services:
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: *sa-password
+      SQLCMDPASSWORD: *sa-password
+      MSSQL_PID: Developer
+    ports:
+      - "14330:1433"
+    volumes:
+      - sqlserver_data:/var/opt/mssql
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -C -Q 'SELECT 1'"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 40s
+
+  # Lần đầu: nạp schema + dữ liệu mẫu. Mỗi lần chạy: đặt lại mật khẩu demo cho tài khoản mẫu
+  # (dữ liệu mẫu không công bố mật khẩu gốc). Hash bcrypt của "1234567890".
+  sqlserver-init:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+    environment:
+      SQLCMDPASSWORD: *sa-password
+      DEMO_PASSWORD_HASH: "$$2b$$10$$4RPVLgT4NPJxWcGY3gf25OVHvi.lQKt0qNy2PDX.8HWNafRW8rPpK"
+    volumes:
+      - ./database/NexusSystem_Database.sql:/scripts/NexusSystem_Database.sql:ro
+    entrypoint:
+      - /bin/bash
+      - -c
+      - |
+        set -e
+        SQLCMD="/opt/mssql-tools18/bin/sqlcmd -S sqlserver -U sa -C -b"
+        if $$SQLCMD -h -1 -Q "SET NOCOUNT ON; SELECT CASE WHEN DB_ID('NexusSystem') IS NULL THEN 0 ELSE 1 END" | grep -q 1; then
+          echo 'NexusSystem da ton tai - bo qua seed.'
+        else
+          echo 'Dang nap du lieu mau...'
+          $$SQLCMD -f 65001 -i /scripts/NexusSystem_Database.sql > /dev/null
+        fi
+        # Khi khởi động lại container, SQL Server đã "healthy" (master sẵn sàng) nhưng
+        # NexusSystem có thể còn đang khôi phục và từ chối đăng nhập vài chục giây: thử lại.
+        for i in $$(seq 1 60); do
+          if $$SQLCMD -d NexusSystem -Q "SET NOCOUNT ON;
+            UPDATE dbo.Employee SET PasswordHash = '$$DEMO_PASSWORD_HASH';
+            UPDATE dbo.Customer SET PasswordHash = '$$DEMO_PASSWORD_HASH' WHERE Email IS NOT NULL;" 2>/dev/null; then
+            echo 'Da dat mat khau demo 1234567890 cho tai khoan mau.'
+            exit 0
+          fi
+          echo 'NexusSystem chua san sang, thu lai sau 2 giay...'
+          sleep 2
+        done
+        echo 'NexusSystem khong san sang sau 2 phut.'
+        exit 1
+    restart: "no"
+
+  mongodb:
+    image: mongo:7.0
+    volumes:
+      - mongodb_data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping').ok"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 20s
+
+  # Tên service phải là "api": nginx của web chuyển /api và /hubs tới http://api:5105.
+  api:
+    build: .
+    depends_on:
+      sqlserver-init:
+        condition: service_completed_successfully
+      mongodb:
+        condition: service_healthy
+    environment:
+      PORT: "5105"
+      DB_SERVER: sqlserver
+      DB_NAME: NexusSystem
+      DB_USER: sa
+      DB_PASSWORD: *sa-password
+      MONGO_URI: mongodb://mongodb:27017
+      MONGO_DB: NexusChat
+      JWT_KEY: demo-only-jwt-key-do-not-use-in-production-0123456789
+      TRUST_PROXY: "1"
+      CORS_ORIGINS: http://localhost:3100
+    ports:
+      - "5205:5105"
+    # Demo không có SMTP: email (OTP, mã tài khoản, hoá đơn) được ghi thành file .html
+    # trong logs/demo-emails của repo, mở bằng trình duyệt để xem. Mã OTP nằm cuối tên file.
+    volumes:
+      - ./logs/demo-emails:/app/logs/emails
+
+  web:
+    build:
+      context: ./frontend-react
+      args:
+        VITE_API_URL: ""
+    depends_on:
+      - api
+    ports:
+      - "3100:80"
+
+volumes:
+  sqlserver_data:
+  mongodb_data:

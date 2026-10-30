@@ -1,0 +1,121 @@
+# Nexus Service Marketing System (Node.js API + React frontend)
+# Chạy cả stack:       docker compose up -d --build      → web http://localhost:3000, API http://localhost:5105
+# Chỉ chạy database:   docker compose up -d sqlserver sqlserver-init mongodb   (rồi npm run dev)
+#
+# Mật khẩu SA lấy từ DB_PASSWORD trong file .env (Docker Compose tự đọc), mặc định Nexus@12345.
+# Volume đã có dữ liệu thì phải dùng đúng mật khẩu lúc volume được tạo lần đầu.
+# Mật khẩu được truyền qua biến môi trường SQLCMDPASSWORD, không nhúng vào câu lệnh.
+x-sa-password: &sa-password ${DB_PASSWORD:-Nexus@12345}
+
+services:
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: nexus_node_sqlserver
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: *sa-password
+      SQLCMDPASSWORD: *sa-password
+      MSSQL_PID: Developer
+    ports:
+      - "1433:1433"
+    volumes:
+      - sqlserver_data:/var/opt/mssql
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -C -Q 'SELECT 1' || /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -Q 'SELECT 1'"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 40s
+    restart: unless-stopped
+
+  # Nạp schema + seed (database/NexusSystem_Database.sql) lần đầu khi DB còn trống.
+  sqlserver-init:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: nexus_node_sqlserver_init
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+    environment:
+      SQLCMDPASSWORD: *sa-password
+    volumes:
+      - ./database/NexusSystem_Database.sql:/scripts/NexusSystem_Database.sql:ro
+    entrypoint:
+      - /bin/bash
+      - -c
+      - |
+        SQLCMD=/opt/mssql-tools18/bin/sqlcmd; [ -x $$SQLCMD ] || SQLCMD=/opt/mssql-tools/bin/sqlcmd
+        if $$SQLCMD -S sqlserver -U sa -C -h -1 -Q "SET NOCOUNT ON; SELECT CASE WHEN DB_ID('NexusSystem') IS NULL THEN 0 ELSE 1 END" | grep -q 1; then
+          echo 'NexusSystem da ton tai - bo qua seed.'
+        else
+          echo 'Dang tao DB NexusSystem tu NexusSystem_Database.sql...'
+          $$SQLCMD -S sqlserver -U sa -C -i /scripts/NexusSystem_Database.sql
+        fi
+    restart: "no"
+
+  mongodb:
+    # Phải cùng image với bản ASP.NET vì hai stack dùng chung volume dữ liệu.
+    image: mongo:latest
+    container_name: nexus_node_mongodb
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping').ok"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 20s
+    restart: unless-stopped
+
+  api:
+    build: .
+    container_name: nexus_node_api
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+      sqlserver-init:
+        condition: service_completed_successfully
+      mongodb:
+        condition: service_healthy
+    environment:
+      PORT: "5105"
+      DB_SERVER: sqlserver
+      DB_PORT: "1433"
+      DB_NAME: NexusSystem
+      DB_USER: sa
+      DB_PASSWORD: *sa-password
+      DB_TRUST_SERVER_CERTIFICATE: "true"
+      MONGO_URI: mongodb://mongodb:27017
+      MONGO_DB: NexusChat
+      JWT_KEY: ${NEXUS_JWT_KEY:-local-development-only-change-this-key-to-something-long}
+      JWT_ISSUER: ${NEXUS_JWT_ISSUER:-nexus-system-api}
+      # Request từ trình duyệt đi qua nginx của service web: tin 1 proxy để lấy đúng IP người dùng.
+      TRUST_PROXY: "1"
+      CORS_ORIGINS: http://localhost:3000
+    ports:
+      - "5105:5105"
+    restart: unless-stopped
+
+  web:
+    build:
+      context: ./frontend-react
+      args:
+        # Rỗng = gọi API cùng origin, nginx chuyển /api và /hubs sang service api.
+        VITE_API_URL: ""
+    container_name: nexus_node_web
+    depends_on:
+      - api
+    ports:
+      - "3000:80"
+    restart: unless-stopped
+
+# Dùng chung dữ liệu với bản ASP.NET để hai backend chạy trên cùng một database.
+# Volume mang tên "moinhat_*" vì stack ASP.NET đang chạy được tạo từ project tên moinhat.
+# Volume chưa có thì Docker tự tạo, sqlserver-init sẽ seed như thường.
+# KHÔNG chạy SQL Server của hai stack cùng lúc trên cùng volume, tắt stack kia trước.
+volumes:
+  sqlserver_data:
+    name: moinhat_sqlserver_data
+  mongodb_data:
+    name: moinhat_mongodb_data

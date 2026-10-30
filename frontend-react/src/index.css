@@ -1,0 +1,254 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 207 100% 94%;
+    /* #E0F1FF */
+    --foreground: 211 41% 18%;
+    /* #1B2D40 */
+    --card: 0 0% 100%;
+    --card-foreground: 211 41% 18%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 211 41% 18%;
+    --primary: 211 41% 18%;
+    --primary-foreground: 207 100% 94%;
+    --secondary: 207 60% 90%;
+    --secondary-foreground: 211 41% 18%;
+    --muted: 207 40% 88%;
+    --muted-foreground: 211 28% 42%;
+    --accent: 207 70% 88%;
+    --accent-foreground: 211 41% 18%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 207 50% 86%;
+    /* #CCE4F7 */
+    --input: 207 50% 86%;
+    --ring: 211 41% 18%;
+    --radius: 0.625rem;
+    --sidebar-background: 207 80% 97%;
+    --sidebar-foreground: 211 41% 18%;
+    --sidebar-primary: 211 41% 18%;
+    --sidebar-primary-foreground: 207 100% 94%;
+    --sidebar-accent: 207 60% 90%;
+    --sidebar-accent-foreground: 211 41% 18%;
+    --sidebar-border: 207 50% 86%;
+    --sidebar-ring: 207 100% 50%;
+  }
+
+  .dark {
+    --background: 211 41% 18%;
+    /* #1B2D40 */
+    --foreground: 207 100% 94%;
+    /* #E0F1FF */
+    --card: 211 45% 15%;
+    /* #152434 */
+    --card-foreground: 207 100% 94%;
+    --popover: 211 45% 15%;
+    --popover-foreground: 207 100% 94%;
+    --primary: 207 100% 94%;
+    --primary-foreground: 211 41% 18%;
+    --secondary: 211 35% 24%;
+    --secondary-foreground: 207 100% 94%;
+    --muted: 211 30% 25%;
+    --muted-foreground: 207 40% 75%;
+    --accent: 211 35% 26%;
+    --accent-foreground: 207 100% 94%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 211 30% 28%;
+    /* #253D56 */
+    --input: 211 30% 28%;
+    --ring: 207 100% 80%;
+    --sidebar-background: 211 45% 14%;
+    /* #132130 */
+    --sidebar-foreground: 207 100% 94%;
+    --sidebar-primary: 207 100% 94%;
+    --sidebar-primary-foreground: 211 41% 18%;
+    --sidebar-accent: 211 35% 24%;
+    --sidebar-accent-foreground: 207 100% 94%;
+    --sidebar-border: 211 30% 26%;
+    --sidebar-ring: 207 100% 80%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+/* ============================================================ */
+/* Smooth Notification (Sonner Toast) Animations & Polish       */
+/* ============================================================ */
+[data-sonner-toaster] {
+  --font-family: inherit;
+  z-index: 99999 !important;
+}
+
+[data-sonner-toast] {
+  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  border-radius: 12px !important;
+  box-shadow: 0 12px 32px -4px rgba(0, 0, 0, 0.12), 0 4px 12px -2px rgba(0, 0, 0, 0.06) !important;
+  backdrop-filter: blur(12px) !important;
+  border: 1px solid rgba(0, 0, 0, 0.08) !important;
+}
+
+/* Smooth slide & fade-in animation */
+[data-sonner-toast][data-mounted="true"] {
+  animation: smoothToastIn 0.32s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
+}
+
+@keyframes smoothToastIn {
+  0% {
+    opacity: 0;
+    transform: translate3d(20px, -10px, 0) scale(0.96);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+/* Strictly hide the X close button on the left corner */
+[data-sonner-toast] [data-close-button],
+[data-sonner-toast] button[aria-label="Close toast"] {
+  display: none !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  visibility: hidden !important;
+}
+
+/* ============================================================ */
+/* Global Sleek Scrollbar for ALL screens & containers          */
+/* ============================================================ */
+html,
+body,
+#app,
+main,
+.overflow-y-auto,
+.overflow-y-scroll {
+  scrollbar-gutter: stable;
+}
+
+/* Firefox standard */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #B3D0EC transparent;
+}
+
+.dark,
+.dark * {
+  scrollbar-color: #2A4666 transparent;
+}
+
+/* WebKit / Blink (Chrome, Edge, Safari) */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #B3D0EC;
+  border-radius: 9999px;
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background: #2A4666;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #8DB0D4;
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: #3B5F8A;
+}
+
+/* ============================================================ */
+/* Global Sleek Dropdown (<select>) Styling                     */
+/* ============================================================ */
+select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23537292' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  background-size: 1rem 1rem;
+  padding-right: 2.25rem !important;
+  cursor: pointer;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+}
+
+.dark select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%238DB0D4' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+}
+
+select:hover {
+  border-color: #38bdf8 !important;
+}
+
+select:focus {
+  outline: none !important;
+  border-color: #0284c7 !important;
+  box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.18) !important;
+}
+
+select option {
+  background-color: #ffffff !important;
+  color: #0f172a !important;
+  padding: 0.5rem 0.75rem;
+}
+
+.dark select option {
+  background-color: #0f172a !important;
+  color: #f8fafc !important;
+}
+
+/* ============================================================ */
+/* Dropdown Menus, Popovers & Notification Droplist Animation   */
+/* ============================================================ */
+.dropdown-popover {
+  animation: popoverSlideIn 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  transform-origin: top right;
+}
+
+@keyframes popoverSlideIn {
+  from {
+    opacity: 0;
+    transform: scale(0.96) translateY(-8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.notification-scroll::-webkit-scrollbar {
+  width: 5px;
+}
+
+.notification-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.notification-scroll::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 9999px;
+}
+
+.dark .notification-scroll::-webkit-scrollbar-thumb {
+  background: #334155;
+}

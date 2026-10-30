@@ -1,0 +1,427 @@
+/* ==========================================================================
+   NEXUS SERVICE MARKETING SYSTEM - RESPONSIVE STYLESHEET
+   File: src/responsive.css
+   Mục đích: Tối ưu hiển thị responsive đa thiết bị (Mobile, Tablet, Laptop, Desktop)
+   cho toàn bộ hệ thống Nexus SMS (Admin, Retail, Technical, Accounts, User).
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   1. GLOBAL MOBILE RESETS & TOUCH OPTIMIZATIONS
+   -------------------------------------------------------------------------- */
+@media (max-width: 1024px) {
+  html, body {
+    overflow-x: hidden;
+    width: 100%;
+    -webkit-text-size-adjust: 100%;
+    -webkit-tap-highlight-color: transparent;
+  }
+}
+
+/* Smooth touch scrolling & scrollbar stability for all scrollable containers */
+.overflow-y-auto,
+.overflow-y-scroll,
+.overflow-x-auto,
+main {
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+  scrollbar-gutter: stable;
+}
+
+/* Thanh cuộn dọc thanh mảnh, hiện đại cho mọi màn hình & component */
+.overflow-y-auto::-webkit-scrollbar,
+.overflow-y-scroll::-webkit-scrollbar,
+main::-webkit-scrollbar {
+  width: 6px;
+}
+.overflow-y-auto::-webkit-scrollbar-track,
+.overflow-y-scroll::-webkit-scrollbar-track,
+main::-webkit-scrollbar-track {
+  background: transparent;
+}
+.overflow-y-auto::-webkit-scrollbar-thumb,
+.overflow-y-scroll::-webkit-scrollbar-thumb,
+main::-webkit-scrollbar-thumb {
+  background: #B3D0EC;
+  border-radius: 9999px;
+}
+.dark .overflow-y-auto::-webkit-scrollbar-thumb,
+.dark .overflow-y-scroll::-webkit-scrollbar-thumb,
+.dark main::-webkit-scrollbar-thumb {
+  background: #2A4666;
+}
+.overflow-y-auto::-webkit-scrollbar-thumb:hover,
+.overflow-y-scroll::-webkit-scrollbar-thumb:hover,
+main::-webkit-scrollbar-thumb:hover {
+  background: #8DB0D4;
+}
+.dark .overflow-y-auto::-webkit-scrollbar-thumb:hover,
+.dark .overflow-y-scroll::-webkit-scrollbar-thumb:hover,
+.dark main::-webkit-scrollbar-thumb:hover {
+  background: #3B5F8A;
+}
+
+/* --------------------------------------------------------------------------
+   2. DASHBOARD LAYOUT & SIDEBAR RESPONSIVE (DRAWER ON MOBILE & TABLET)
+   -------------------------------------------------------------------------- */
+@media (max-width: 768px) {
+  /* Biến Sidebar thành Drawer trượt đè lên màn hình thay vì co ép nội dung */
+  aside {
+    position: fixed !important;
+    top: 0 !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    z-index: 50 !important;
+    height: 100vh !important;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.25), 0 8px 10px -6px rgba(0, 0, 0, 0.15) !important;
+  }
+
+  /* Khi sidebar mở trên mobile, giới hạn bề rộng không chiếm hết 100% màn hình */
+  aside.w-64 {
+    width: min(80vw, 280px) !important;
+    min-width: min(80vw, 280px) !important;
+  }
+
+  /* Giảm kích thước và padding tiêu đề thương hiệu trong Sidebar */
+  aside .h-16 {
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+  }
+
+  /* Tối ưu khoảng cách nút bấm trong sidebar */
+  aside nav button {
+    padding-top: 0.625rem !important;
+    padding-bottom: 0.625rem !important;
+    font-size: 0.8125rem !important;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   3. FIXED HEADER BAR RESPONSIVE
+   -------------------------------------------------------------------------- */
+@media (max-width: 640px) {
+  /* Thu nhỏ padding header trên điện thoại */
+  header.h-16 {
+    padding-left: 0.75rem !important;
+    padding-right: 0.75rem !important;
+  }
+
+  /* Giới hạn độ dài tiêu đề trang để không tràn hàng nút chức năng */
+  header h1 {
+    font-size: 0.9375rem !important;
+    max-width: 140px !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+  }
+
+  /* Thu gọn khoảng cách các nút tròn trên header */
+  header .flex.items-center.space-x-2,
+  header .flex.items-center.space-x-3 {
+    gap: 0.375rem !important;
+  }
+
+  /* Thu nhỏ kích thước nút tròn từ 36px xuống 32px */
+  header button.h-9.w-9 {
+    height: 2rem !important;
+    width: 2rem !important;
+  }
+
+  header button.h-9.w-9 svg {
+    height: 0.9rem !important;
+    width: 0.9rem !important;
+  }
+}
+
+@media (max-width: 480px) {
+  /* Ẩn bớt nút Search & Settings phụ trên điện thoại rất nhỏ để ưu tiên nút Darkmode & Chuông */
+  header button[title="Tìm kiếm"],
+  header button[title="Cài đặt"] {
+    display: none !important;
+  }
+
+  header h1 {
+    max-width: 110px !important;
+    font-size: 0.875rem !important;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   4. MAIN VIEWPORT & GREETING BANNER
+   -------------------------------------------------------------------------- */
+@media (max-width: 640px) {
+  /* Giảm padding của main content trên điện thoại (từ 2rem xuống 0.75rem-1rem) */
+  main.p-6,
+  main.sm\:p-8 {
+    padding: 0.875rem !important;
+    gap: 1rem !important;
+  }
+
+  /* Greeting banner xếp dọc thay vì xếp ngang trên mobile */
+  main > div.pb-2.flex {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 0.75rem !important;
+  }
+
+  /* Các nút hành động (Export, New Report) co giãn đều */
+  main > div.pb-2.flex > div:last-child {
+    width: 100% !important;
+    display: flex !important;
+    justify-content: flex-start !important;
+    gap: 0.5rem !important;
+  }
+
+  main > div.pb-2.flex > div:last-child button {
+    flex: 1 !important;
+    justify-content: center !important;
+    padding: 0.5rem 0.75rem !important;
+    font-size: 0.75rem !important;
+  }
+
+  /* Tiêu đề chào mừng */
+  main > div.pb-2.flex h2 {
+    font-size: 1.25rem !important;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   5. DATA TABLES RESPONSIVE ENGINE (CHỐNG BỂ BẢNG TRÊN MOBILE)
+   -------------------------------------------------------------------------- */
+/* Bọc bảng tự động cuộn ngang trơn tru khi vượt quá chiều rộng màn hình */
+.overflow-x-auto {
+  width: 100% !important;
+  max-width: 100% !important;
+  overflow-x: auto !important;
+  display: block !important;
+}
+
+/* Đảm bảo bảng có min-width hợp lý để các cột không bị ép co rút chữ */
+@media (max-width: 768px) {
+  table {
+    min-width: 640px !important;
+  }
+
+  table th,
+  table td {
+    padding-left: 0.625rem !important;
+    padding-right: 0.625rem !important;
+    padding-top: 0.5rem !important;
+    padding-bottom: 0.5rem !important;
+    font-size: 0.75rem !important;
+    white-space: nowrap !important;
+  }
+
+  /* Cho phép cột tên/mô tả tự bẻ dòng nhẹ */
+  table td.break-words,
+  table td.whitespace-normal {
+    white-space: normal !important;
+  }
+}
+
+/* Thanh cuộn ngang thanh mảnh cho bảng dữ liệu */
+.overflow-x-auto::-webkit-scrollbar {
+  height: 5px;
+}
+.overflow-x-auto::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.03);
+  border-radius: 9999px;
+}
+.overflow-x-auto::-webkit-scrollbar-thumb {
+  background: #B3D0EC;
+  border-radius: 9999px;
+}
+.dark .overflow-x-auto::-webkit-scrollbar-thumb {
+  background: #385677;
+}
+
+/* --------------------------------------------------------------------------
+   6. GRID LAYOUT & STAT CARDS ADAPTATION
+   -------------------------------------------------------------------------- */
+/* Tablet (<= 1024px): Bẻ 4 cột thành 2 cột */
+@media (max-width: 1024px) {
+  .grid-cols-4,
+  .lg\:grid-cols-4 {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  .grid-cols-3,
+  .lg\:grid-cols-3 {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+}
+
+/* Mobile (<= 640px): Bẻ lưới sang 1 cột hoặc 2 cột mini */
+@media (max-width: 640px) {
+  .grid-cols-4,
+  .sm\:grid-cols-4,
+  .lg\:grid-cols-4,
+  .grid-cols-3,
+  .sm\:grid-cols-3,
+  .lg\:grid-cols-3,
+  .md\:grid-cols-2 {
+    grid-template-columns: repeat(1, minmax(0, 1fr)) !important;
+  }
+
+  /* Riêng các khối thống kê nhanh 2 cột nhỏ trên mobile */
+  .grid-cols-2 {
+    grid-template-columns: repeat(1, minmax(0, 1fr)) !important;
+  }
+
+  /* Thu nhỏ padding của các card thống kê */
+  .p-6 {
+    padding: 1rem !important;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   7. MODALS & DIALOGS RESPONSIVE (POPUPS CHỐNG TRÀN MÀN HÌNH TRÊN MỌI THIẾT BỊ)
+   -------------------------------------------------------------------------- */
+/* Cho mọi kích thước màn hình (Desktop, Laptop, Tablet, Mobile) */
+.fixed.inset-0.z-50 > div {
+  max-height: 90vh !important;
+  overflow-y: auto !important;
+}
+
+@media (max-width: 640px) {
+  /* Hộp thoại fixed overlay */
+  .fixed.inset-0.z-50 {
+    padding: 0.75rem !important;
+    align-items: flex-end !important; /* Bottom-sheet style trên mobile */
+  }
+
+  /* Thẻ modal content */
+  .fixed.inset-0.z-50 > div {
+    width: 100% !important;
+    max-width: 100% !important;
+    max-height: 88vh !important;
+    overflow-y: auto !important;
+    border-radius: 1rem 1rem 0.5rem 0.5rem !important;
+    padding: 1rem !important;
+  }
+
+  /* Mọi form nằm trong modal chuyển về 1 cột */
+  .fixed.inset-0.z-50 form .grid,
+  .fixed.inset-0.z-50 .grid-cols-2,
+  .fixed.inset-0.z-50 .grid-cols-3 {
+    grid-template-columns: 1fr !important;
+    gap: 0.75rem !important;
+  }
+
+  /* Nút bấm Lưu / Hủy trong Modal xếp dọc hoặc full-width */
+  .fixed.inset-0.z-50 .flex.justify-end,
+  .fixed.inset-0.z-50 .modal-actions {
+    flex-direction: column-reverse !important;
+    gap: 0.5rem !important;
+  }
+
+  .fixed.inset-0.z-50 .flex.justify-end button,
+  .fixed.inset-0.z-50 .modal-actions button {
+    width: 100% !important;
+    justify-content: center !important;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   8. FORM CONTROLS & TOUCH TARGET SIZING
+   -------------------------------------------------------------------------- */
+@media (max-width: 640px) {
+  /* Đảm bảo ô input, select có chiều cao vừa ngón tay chạm */
+  input[type="text"],
+  input[type="email"],
+  input[type="password"],
+  input[type="number"],
+  select,
+  textarea {
+    min-height: 2.625rem !important;
+    font-size: 0.875rem !important;
+  }
+
+  /* Label rõ ràng, không bị co ép */
+  label {
+    font-size: 0.75rem !important;
+    margin-bottom: 0.25rem !important;
+  }
+
+  /* Bộ lọc / Search box trên thanh toolbar */
+  .flex.items-center.justify-between.gap-4,
+  .flex.flex-col.sm\:flex-row {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 0.625rem !important;
+  }
+
+  /* Input tìm kiếm mở rộng full width */
+  .relative.w-64,
+  .relative.w-72,
+  .relative.w-80 {
+    width: 100% !important;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   9. LOGIN SCREEN RESPONSIVE (TRANG ĐĂNG NHẬP)
+   -------------------------------------------------------------------------- */
+@media (max-width: 640px) {
+  /* Giảm khoảng đệm dọc trên mobile */
+  .min-h-screen.flex.flex-col.justify-center {
+    padding-top: 2rem !important;
+    padding-bottom: 2rem !important;
+  }
+
+  /* Nút đăng nhập nhanh 5 Role xếp dọc rõ ràng */
+  .grid.grid-cols-2.gap-2.text-xs {
+    grid-template-columns: 1fr !important;
+    gap: 0.5rem !important;
+  }
+
+  /* Nút customer chiếm trọn 1 dòng */
+  .col-span-2.sm\:col-span-1 {
+    grid-column: span 1 / span 1 !important;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   10. UTILITY HELPER CLASSES (DÙNG CHO TÙY BIẾN NHANH)
+   -------------------------------------------------------------------------- */
+/* Ẩn hiện theo kích thước màn hình */
+@media (max-width: 768px) {
+  .hide-on-mobile {
+    display: none !important;
+  }
+  .show-on-mobile {
+    display: block !important;
+  }
+  .flex-on-mobile {
+    display: flex !important;
+  }
+}
+
+@media (min-width: 769px) {
+  .show-on-mobile {
+    display: none !important;
+  }
+  .hide-on-desktop {
+    display: none !important;
+  }
+}
+
+/* Ép container cuộn ngang tiện lợi */
+.touch-scroll-x {
+  overflow-x: auto !important;
+  -webkit-overflow-scrolling: touch !important;
+  white-space: nowrap !important;
+}
+
+/* Trợ giúp full-width trên mobile */
+@media (max-width: 640px) {
+  .mobile-w-full {
+    width: 100% !important;
+  }
+  .mobile-flex-col {
+    flex-direction: column !important;
+  }
+  .mobile-text-center {
+    text-align: center !important;
+  }
+}
+

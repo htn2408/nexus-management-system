@@ -1,0 +1,17 @@
+.chatbox-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: #7cb8e4 transparent;
+}
+.chatbox-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+.chatbox-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.chatbox-scrollbar::-webkit-scrollbar-thumb {
+  background: #7cb8e4;
+  border-radius: 9999px;
+}
+.dark .chatbox-scrollbar::-webkit-scrollbar-thumb {
+  background: #2c4a68;
+}
